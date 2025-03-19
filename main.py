@@ -13,18 +13,22 @@ from chatterbot import ChatBot
 from chatterbot.trainers import ListTrainer
 import spacy
 import os
+import string
 
 # ------------------- FIX FOR CHATTERBOT/SPACY ISSUE ------------------- #
 from chatterbot.tagging import PosLemmaTagger
-from chatterbot.storage import StorageAdapter
 
 class CustomPosLemmaTagger(PosLemmaTagger):
     def __init__(self, language):
-        super().__init__(language)
-        # Load spaCy model with full name
+        # Override the language handling
+        self.language = language  # Store the language string directly
+        self.punctuation_table = str.maketrans(dict.fromkeys(string.punctuation))
+        
+        # Load the spaCy model using the full name
         self.nlp = spacy.load("en_core_web_sm")
 
-# Monkey-patch the default tagger
+# Override the default tagger in chatterbot
+from chatterbot.storage import StorageAdapter
 StorageAdapter.tagger = CustomPosLemmaTagger
 # ---------------------------------------------------------------------- #
 
@@ -39,7 +43,7 @@ sid = SentimentIntensityAnalyzer()
 # Initialize and train ChatterBot with custom settings
 chatbot = ChatBot(
     "EcoSlayBot",
-    tagger_language="en_core_web_sm"  # Use full model name
+    tagger=CustomPosLemmaTagger  # Use the custom tagger
 )
 trainer = ListTrainer(chatbot)
 
