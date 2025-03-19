@@ -6,3 +6,4 @@ scikit-learn==1.3.0
 nltk==3.8.1
 pytrends==4.9.2
 chatterbot==1.0.8
+spacy==3.7.4
